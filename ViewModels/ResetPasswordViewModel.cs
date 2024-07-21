@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eni.Sso.ViewModels;
+namespace Login.ViewModels;
 
 public class ResetPasswordViewModel
 {
