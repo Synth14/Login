@@ -1,0 +1,16 @@
+﻿@inject IViewLocalizer Localizer
+
+@model AccountNotConfirmedViewModel
+@{
+    ViewData["Title"] = Localizer["Title"];
+    ViewData["H1"] = Localizer["H1"];
+}
+<p>
+    @Localizer["Message"]
+</p>
+<form asp-action="SendAccountConfirmationEmail" asp-controller="Account">
+    <div class="form-floating mb-3">
+        <input asp-for="UserName" type="hidden" class="form-control rounded-0" readonly />
+    </div>
+    <button class="w-100 mb-2 btn btn-lg rounded-0 btn-primary" type="submit">@Localizer["Button_Send"]</button>
+</form>

@@ -1,0 +1,50 @@
+﻿@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResources> SharedLocalizer
+
+@model RegisterViewModel
+@{
+    ViewData["Title"] = Localizer["Title"];
+    ViewData["H1"] = Localizer["H1"];
+    string? returnUrl = Context.Request.Query["returnUrl"];
+}
+
+<form asp-action="Register" asp-controller="Account" asp-route-returnUrl="@returnUrl">
+    @if (Model?.Errors != null)
+    {
+        <div class="text-danger">
+            <ul>
+                @foreach (string error in Model.Errors)
+                {
+                    <li>
+                        @error
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    <div class="form-floating mb-3">
+        <input asp-for="UserName" type="email" class="form-control rounded-0">
+        <label for="@nameof(Model.UserName)">@SharedLocalizer["Input_Email"]</label>
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Password" type="password" class="form-control rounded-0">
+        <label for="@nameof(Model.Password)">@SharedLocalizer["Input_Password"]</label>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="FirstName" type="text" class="form-control rounded-0">
+        <label for="@nameof(Model.FirstName)">@Localizer["FirstName"]</label>
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="LastName" type="text" class="form-control rounded-0">
+        <label for="@nameof(Model.LastName)">@Localizer["LastName"]</label>
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <button class="w-100 mb-2 btn btn-lg rounded-0 btn-primary" type="submit">@Localizer["Submit"]</button>
+</form>
