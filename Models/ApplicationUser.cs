@@ -5,6 +5,9 @@ namespace Login.Models
 {
     public class ApplicationUser:IdentityUser<Guid>
     {
+        public ApplicationUser(string userName) : base(userName)
+        {
+        }
         [PersonalData]
         [StringLength(4)]
         public string? Civility { get; set; }

@@ -1,0 +1,23 @@
+﻿@using System.Net
+@inject IWebHostEnvironment environment
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Title"];
+    ViewData["H1"] = Localizer["H1"];
+    string? returnUrl = Context.Request.Query["returnUrl"];
+    string? callbackUri = WebUtility.UrlDecode(Context.Request.Query["callbackUri"]);
+}
+
+<p>
+    @Localizer["Text"]
+</p>
+<a class="w-100 mb-2 btn btn-lg rounded-0 btn-primary" asp-action="Login" asp-controller="Account" asp-route-returnUrl="@returnUrl">
+    @Localizer["Continue_Link"]
+</a>
+
+@if (environment.IsDevelopment() && !string.IsNullOrEmpty(callbackUri))
+{
+    <a class="w-100 mb-2 btn btn-lg rounded-0 btn-primary" href="@callbackUri">
+        @Localizer["AutoValidateAccount"]
+    </a>
+}

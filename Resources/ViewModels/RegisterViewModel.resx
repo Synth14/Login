@@ -130,7 +130,7 @@
     <value>Le nom ne doit pas faire plus de 128 caractères</value>
   </data>
   <data name="LastNameRequired" xml:space="preserve">
-    <value>Le nom ne doit pas faire plus de 128 caractères</value>
+    <value>Le nom est obligatoire</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Le mot de passe est obligatoire</value>

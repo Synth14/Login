@@ -1,5 +1,7 @@
 using Login.Data;
 using Login.Models;
+using Login.Resources;
+using Login.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +19,9 @@ namespace Login
                 .Replace("{DbUser}", builder.Configuration["ConnectionStrings:DbUser"])
                 .Replace("{DbPassword}", builder.Configuration["ConnectionStrings:DbPassword"]);
 
-            builder.Services.AddDbContext<ApplicationDbContext>(options => builder.Services.AddDatabaseDeveloperPageExceptionFilter());
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21))));
+            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -26,6 +30,7 @@ namespace Login
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                 options.Lockout.MaxFailedAccessAttempts = 5;
             })
+             .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
              .AddEntityFrameworkStores<ApplicationDbContext>()
              .AddDefaultTokenProviders();
 
@@ -34,6 +39,7 @@ namespace Login
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
 
+            builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.AddAuthentication();
             //builder.Services.AddRazorPages();
 
