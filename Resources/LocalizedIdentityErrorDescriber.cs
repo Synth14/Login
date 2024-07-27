@@ -12,4 +12,12 @@ public class LocalizedIdentityErrorDescriber : IdentityErrorDescriber
             Description = string.Format(LocalizedIdentityErrors.DuplicateUserName, userName)
         };
     }
+    public override IdentityError PasswordMismatch()
+    {
+        return new IdentityError
+        {
+            Code = nameof(PasswordMismatch),
+            Description = string.Format(LocalizedIdentityErrors.PasswordMismatch)
+        };
+    }
 }

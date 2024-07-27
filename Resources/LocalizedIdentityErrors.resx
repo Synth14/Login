@@ -120,4 +120,7 @@
   <data name="DuplicateUserName" xml:space="preserve">
     <value>Le nom d'utilisateur {0} est déjà utilisé</value>
   </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>Les mots de passes ne correspondent pas</value>
+  </data>
 </root>

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using Login.Helpers.Validators;
 namespace Login.ViewModels;
 
 public class RegisterViewModel
@@ -7,6 +7,7 @@ public class RegisterViewModel
     [StringLength(256, ErrorMessage = "UserNameLength")]
     [Required(ErrorMessage = "UserNameRequired")]
     [EmailAddress(ErrorMessage = "EmailAddress")]
+    [CustomEmailDomainValidation(ErrorMessage = "EmailDomainNotAllowed")]
     public string UserName { get; set; } = default!;
 
     [Required(ErrorMessage = "PasswordRequired")]

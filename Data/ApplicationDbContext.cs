@@ -1,5 +1,4 @@
 ﻿using Login.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,5 +10,15 @@ namespace Login.Data
             : base(options)
         {
         }
+        public DbSet<AllowedDomain> AllowedDomains { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AllowedDomain>()
+                .HasIndex(d => d.DomainName)
+                .IsUnique();
+        }
+
     }
 }

@@ -68,5 +68,14 @@ namespace Login.Resources {
                 return ResourceManager.GetString("DuplicateUserName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Les mots de passes ne correspondent pas.
+        /// </summary>
+        public static string PasswordMismatch {
+            get {
+                return ResourceManager.GetString("PasswordMismatch", resourceCulture);
+            }
+        }
     }
 }

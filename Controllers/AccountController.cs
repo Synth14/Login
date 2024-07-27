@@ -284,6 +284,11 @@ namespace Login.Controllers
         [HttpGet("password/reseted"), AllowAnonymous]
         public IActionResult PasswordReseted()
     => View();
+        [HttpPost("password/reseted"), AllowAnonymous]
+        public IActionResult PasswordResetedPost()
+        {
+            return RedirectToAction("Login", "Account");
+        }
     }
 }
 
