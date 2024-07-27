@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="FirstNameRequired" xml:space="preserve">
+    <value>Le prénom est obligatoire</value>
+  </data>
   <data name="Input_Email" xml:space="preserve">
     <value>Email</value>
   </data>
   <data name="Input_Password" xml:space="preserve">
     <value>Mot de passe</value>
+  </data>
+  <data name="LastNameRequired" xml:space="preserve">
+    <value>Le nom est obligatoire</value>
+  </data>
+  <data name="PasswordPrerequisite" xml:space="preserve">
+    <value>Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre, et un caractère spécial.</value>
   </data>
   <data name="ViewModelEmailAddress" xml:space="preserve">
     <value>Le format de l'adresse e-mail est incorrect</value>

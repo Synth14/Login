@@ -5,12 +5,12 @@ namespace Login.ViewModels;
 public class RegisterViewModel
 {
     [StringLength(256, ErrorMessage = "UserNameLength")]
-    [Required(ErrorMessage = "UserNameRequired")]
+    [Required(ErrorMessage = "ViewModel_UserNameRequired")]
     [EmailAddress(ErrorMessage = "EmailAddress")]
     [CustomEmailDomainValidation(ErrorMessage = "EmailDomainNotAllowed")]
     public string UserName { get; set; } = default!;
 
-    [Required(ErrorMessage = "PasswordRequired")]
+    [Required(ErrorMessage = "ViewModel_PasswordRequired")]
     public string Password { get; set; } = default!;
 
     [StringLength(128, ErrorMessage = "FirstNameLength")]

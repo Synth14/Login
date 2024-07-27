@@ -1,5 +1,4 @@
-﻿
-namespace Login.Services
+﻿namespace Login.Services.EmailService
 {
     public interface IEmailService
     {

@@ -120,11 +120,17 @@
   <data name="FirstName" xml:space="preserve">
     <value>Prénom</value>
   </data>
+  <data name="FirstNameRequired" xml:space="preserve">
+    <value>Le prénom est obligatoire</value>
+  </data>
   <data name="H1" xml:space="preserve">
     <value>Créez votre compte</value>
   </data>
   <data name="LastName" xml:space="preserve">
     <value>Nom</value>
+  </data>
+  <data name="LastNameRequired" xml:space="preserve">
+    <value>Le nom de famille est obligatoire</value>
   </data>
   <data name="Submit" xml:space="preserve">
     <value>Créer mon compte</value>

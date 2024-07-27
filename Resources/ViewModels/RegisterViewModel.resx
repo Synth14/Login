@@ -123,22 +123,10 @@
   <data name="FirstNameLength" xml:space="preserve">
     <value>Le prénom ne doit pas faire plus de 128 caractères</value>
   </data>
-  <data name="FirstNameRequired" xml:space="preserve">
-    <value>Le prénom est obligatoire</value>
-  </data>
   <data name="LastNameLength" xml:space="preserve">
     <value>Le nom ne doit pas faire plus de 128 caractères</value>
   </data>
-  <data name="LastNameRequired" xml:space="preserve">
-    <value>Le nom est obligatoire</value>
-  </data>
-  <data name="PasswordRequired" xml:space="preserve">
-    <value>Le mot de passe est obligatoire</value>
-  </data>
   <data name="UserNameLength" xml:space="preserve">
     <value>L'email ne doit pas dépasser 256 caractères</value>
-  </data>
-  <data name="UserNameRequired" xml:space="preserve">
-    <value>L'adresse e-mail est obligatoire</value>
   </data>
 </root>

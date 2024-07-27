@@ -1,5 +1,5 @@
 ﻿using Login.Models;
-using Login.Services;
+using Login.Services.EmailService;
 using Login.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

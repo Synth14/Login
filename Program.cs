@@ -1,9 +1,11 @@
 using Login.Data;
 using Login.Models;
 using Login.Resources;
-using Login.Services;
+using Login.Services.EmailService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Login
@@ -35,17 +37,30 @@ namespace Login
              .AddDefaultTokenProviders();
 
             builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            //builder.Services.AddControllersWithViews()
+            //    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+            //    .AddDataAnnotationsLocalization();
+            //la debut
             builder.Services.AddControllersWithViews()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization();
-
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization(options =>
+                {
+                    options.DataAnnotationLocalizerProvider = (type, factory) =>
+                        factory.Create(typeof(SharedResources));
+                });
+            builder.Services.Configure<LocalizationOptions>(options =>
+            {
+                options.ResourcesPath = "Resources";
+            });
+            //la
             builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.AddAuthentication();
             //builder.Services.AddRazorPages();
 
 
             var app = builder.Build();
-            string[] supportedCultures = new[] { "en", "fr" };
+
+            string[] supportedCultures = new[] { "en-EN", "fr-FR" };
             RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[1])
                 .AddSupportedCultures(supportedCultures)
@@ -68,6 +83,7 @@ namespace Login
             app.UseStaticFiles();
 
             app.UseRouting();
+
 
             app.UseAuthentication();
             app.UseAuthorization();
