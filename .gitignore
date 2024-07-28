@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/CDataProtection-Keys
+/DataProtection-Keys
+/devkey.jwk
+/keys/key-7086c376-b346-48f3-b34f-b381588db4e4.xml
