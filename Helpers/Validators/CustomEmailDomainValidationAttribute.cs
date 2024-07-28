@@ -10,13 +10,13 @@ namespace Login.Helpers.Validators
         {
             if (value is string email)
             {
-                var dbContext = (ApplicationDbContext)validationContext.GetService(typeof(ApplicationDbContext));
+                var dbContext = (ApplicationDbContext)validationContext.GetService(typeof(ApplicationDbContext))!;
                 var allowedDomains = dbContext.AllowedDomains.Select(d => d.DomainName).ToList();
 
                 string domain = email.Split('@').Last();
                 if (allowedDomains.Contains(domain))
                 {
-                    return ValidationResult.Success;
+                    return ValidationResult.Success!;
                 }
             }
 

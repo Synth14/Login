@@ -22,4 +22,8 @@ RUN dotnet publish "./Login.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:U
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER root
+RUN mkdir -p /app/keys && chown -R app:app /app/keys
+USER app
+VOLUME /app/keys
 ENTRYPOINT ["dotnet", "Login.dll"]

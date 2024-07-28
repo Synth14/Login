@@ -15,13 +15,13 @@
 
     <div class="form-floating mb-3">
         <input asp-for="UserName" type="email" class="form-control rounded-0">
-        <label for="@nameof(Model.UserName)">@SharedLocalizer["Input_Email"]</label>
+        <label for="@nameof(Model.UserName)" id="username" autocomplete="username">@SharedLocalizer["Input_Email"]</label>
         <span asp-validation-for="UserName" class="text-danger"></span>
     </div>
 
     <div class="form-floating mb-3">
         <input asp-for="Password" type="password" class="form-control rounded-0">
-        <label for="@nameof(Model.Password)">@SharedLocalizer["Input_Password"]</label>
+        <label for="@nameof(Model.Password)" id="password" autocomplete="current-password">@SharedLocalizer["Input_Password"]</label>
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 

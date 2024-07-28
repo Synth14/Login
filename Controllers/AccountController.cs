@@ -14,7 +14,6 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Login.Controllers
 {
-
     [Route("account")]
     public class AccountController : Controller
     {
@@ -43,6 +42,7 @@ namespace Login.Controllers
             _env = env;
 
         }
+
         [HttpGet("login"), AllowAnonymous]
         public IActionResult Login() => View();
 
@@ -137,6 +137,7 @@ namespace Login.Controllers
         {
             return View(new AccountNotConfirmedViewModel(userName, returnUrl));
         }
+
         [HttpPost("register"), AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterPost(RegisterViewModel viewModel, string returnUrl)
         {
@@ -179,7 +180,7 @@ namespace Login.Controllers
         {
             string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            string email = WebUtility.UrlEncode(user.UserName);
+            string email = WebUtility.UrlEncode(user.UserName!);
             returnUrl = WebUtility.UrlEncode(returnUrl);
             string callbackUrl = new StringBuilder(HttpContext.Request.Scheme)
                 .Append("://").Append(HttpContext.Request.Host)
@@ -243,7 +244,7 @@ namespace Login.Controllers
             string code = await _userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            string email = WebUtility.UrlEncode(user.UserName);
+            string email = WebUtility.UrlEncode(user.UserName!);
 
             returnUrl = WebUtility.UrlEncode(returnUrl);
             string callbackUrl = new StringBuilder(HttpContext.Request.Scheme)
@@ -281,13 +282,49 @@ namespace Login.Controllers
 
             return RedirectToAction(nameof(PasswordReseted));
         }
+
         [HttpGet("password/reseted"), AllowAnonymous]
         public IActionResult PasswordReseted()
-    => View();
+          => View();
+
         [HttpPost("password/reseted"), AllowAnonymous]
         public IActionResult PasswordResetedPost()
         {
             return RedirectToAction("Login", "Account");
+        }
+
+        [HttpGet("logout")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Redirect("/");
+        }
+        [HttpPost("send-confirmation-email")]
+        public async Task<IActionResult> SendAccountConfirmationEmail(AccountNotConfirmedViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("AccountNotConfirmed", model);
+            }
+
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                // Gérer le cas où l'utilisateur n'est pas trouvé
+                return RedirectToAction(nameof(Login));
+            }
+
+            var uri = await SendAccountConfirmationEmailAsync(user, model.ReturnUrl ?? "/");
+
+            if (_env.IsDevelopment())
+            {
+                return RedirectToAction(nameof(Created), new { callbackUri = WebUtility.UrlEncode(uri.AbsoluteUri) });
+            }
+            else
+            {
+                return RedirectToAction(nameof(Created), new { returnUrl = model.ReturnUrl });
+            }
         }
     }
 }
