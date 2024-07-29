@@ -6,7 +6,7 @@ public class RegisterViewModel
 {
     [StringLength(256, ErrorMessage = "UserNameLength")]
     [Required(ErrorMessage = "ViewModel_UserNameRequired")]
-    [EmailAddress(ErrorMessage = "EmailAddress")]
+    [EmailAddress(ErrorMessage = "ViewModelEmailAddress")]
     [CustomEmailDomainValidation(ErrorMessage = "EmailDomainNotAllowed")]
     public string UserName { get; set; } = default!;
 

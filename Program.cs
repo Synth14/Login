@@ -28,7 +28,7 @@ namespace Login
                 .Replace("{DbPassword}", builder.Configuration["ConnectionStrings:DbPassword"]);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21))));
+                options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddDevelopmentSignKey();
 
@@ -77,6 +77,14 @@ namespace Login
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Login", Version = "v1" });
             });
+            builder.Services.AddIdentityServer()
+                .AddConfigurationStore(o =>
+                o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+                .AddOperationalStore(o => o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddDeveloperSigningCredential(); 
+                
+
 
             // Modification de la configuration Antiforgery
             builder.Services.AddAntiforgery(options =>
@@ -119,6 +127,7 @@ namespace Login
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Login v1"));
             }
 
+            app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllerRoute(
