@@ -48,7 +48,7 @@ namespace Login.Controllers
 
         [HttpPost("login"), AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginPost(LoginViewModel viewModel, string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel viewModel, string returnUrl)
         {
             if (!ModelState.IsValid)
                 return View(viewModel);
