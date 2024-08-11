@@ -13,6 +13,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Login.Helpers;
+using Duende.IdentityServer.Services;
 
 namespace Login
 {
@@ -70,7 +72,10 @@ namespace Login
             {
                 o.LogoutPath = "/account/logout";
             });
-            builder.Services.AddTransient<IEmailService, EmailService>();
+            builder.Services.AddTransient<IEmailService, EmailService>(); 
+            builder.Services.AddSingleton<IEventSink, IdentityServerEventSink>();
+
+
             builder.Services.AddAuthentication();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>

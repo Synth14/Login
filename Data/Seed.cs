@@ -124,7 +124,7 @@ namespace Login.Data
                 {
                     Client testClient = new()
                     {
-                        AllowedCorsOrigins = { "http://localhost:5002" },
+                        AllowedCorsOrigins = { "https://localhost:7141" },
                         AllowedGrantTypes = GrantTypes.Code,
                         AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
@@ -136,7 +136,7 @@ namespace Login.Data
                         ClientId = "C95335E5814247ECAC857646BB5676D5",
                         RequireClientSecret = false,
                         ClientName = "API Swagger test client",
-                        RedirectUris = { "http://localhost:5002/swagger/oauth2-redirect.html" },
+                        RedirectUris = { "https://localhost:7141/swagger/oauth2-redirect.html" },
                     };
                     configurationDbContext.Clients.Add(testClient.ToEntity());
                 }
