@@ -18,7 +18,7 @@ namespace Login
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -77,13 +77,19 @@ namespace Login
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Login", Version = "v1" });
             });
-            builder.Services.AddIdentityServer()
+            builder.Services.AddIdentityServer(options =>
+            {
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+            })
                 .AddConfigurationStore(o =>
                 o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
                 .AddOperationalStore(o => o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
                 .AddAspNetIdentity<ApplicationUser>()
-                .AddDeveloperSigningCredential(); 
-                
+                .AddDeveloperSigningCredential();
+
 
 
             // Modification de la configuration Antiforgery
@@ -97,7 +103,7 @@ namespace Login
                 options.Cookie.Path = "/";
             });
             var app = builder.Build();
-
+            await app.SeedDatabase();
             string[] supportedCultures = ["en-EN", "fr-FR"];
             RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[1])
