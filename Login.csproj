@@ -7,6 +7,7 @@
     <UserSecretsId>aspnet-Login-be3d0a39-46f0-4f63-9a35-7920939e082e</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <DockerComposeProjectPath>docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
