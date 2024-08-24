@@ -21,6 +21,8 @@ namespace Login.Data
 
             PersistedGrantDbContext persistedGrantDbContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
             await persistedGrantDbContext.Database.MigrateAsync();
+
+            #region DefaultIdentityResources
             if (!await configurationDbContext.IdentityResources.AnyAsync())
             {
                 IdentityResource[] identityResources = new IdentityResource[]
@@ -99,57 +101,72 @@ namespace Login.Data
                 IEnumerable<Duende.IdentityServer.EntityFramework.Entities.IdentityResource> entities = identityResources.Select(ressource => ressource.ToEntity());
                 configurationDbContext.IdentityResources.AddRange(entities);
             }
+            #endregion
+
             if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "78D9E2F100D049E8A46477CEFC811C49"))
+            {
+                Client mvcWebApplication = new()
                 {
-                    Client mvcWebApplication = new()
-                    {
-                        AllowedCorsOrigins = { "https://localhost:5001" },
-                        AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                        AllowedScopes = {
+                    AllowedCorsOrigins = { "https://localhost:5001" },
+                    AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                    AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.Email,
                     "read",
                     "write"
                 },
-                        ClientId = "78D9E2F100D049E8A46477CEFC811C49",
-                        ClientName = "MVC Web Application",
-                        ClientSecrets = { new Secret("22435308B4C04FD9B4886BC4457F66B445AB50DF52E34F3C904B841F380F7225".ToSha256()) },
-                        PostLogoutRedirectUris = { "https://localhost:5001/signout-callback-oidc" },
-                        RedirectUris = { "https://localhost:5001/signin-oidc" }
-                    };
-                    configurationDbContext.Clients.Add(mvcWebApplication.ToEntity());
-                }
-                if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "C95335E5814247ECAC857646BB5676D5"))
+                    ClientId = "78D9E2F100D049E8A46477CEFC811C49",
+                    ClientName = "MVC Web Application",
+                    ClientSecrets = { new Secret("22435308B4C04FD9B4886BC4457F66B445AB50DF52E34F3C904B841F380F7225".ToSha256()) },
+                    PostLogoutRedirectUris = { "https://localhost:5001/signout-callback-oidc" },
+                    RedirectUris = { "https://localhost:5001/signin-oidc" }
+                };
+                configurationDbContext.Clients.Add(mvcWebApplication.ToEntity());
+            }
+            #region StocktrackerScopes
+            if (!await configurationDbContext.ApiScopes.AnyAsync(scope => scope.Name == "inventory.update"))
+            {
+                ApiScope booksRead = new()
                 {
-                    Client testClient = new()
-                    {
-                        AllowedCorsOrigins = { "https://localhost:7141" },
-                        AllowedGrantTypes = GrantTypes.Code,
-                        AllowedScopes = {
-                    IdentityServerConstants.StandardScopes.OpenId,
-                    IdentityServerConstants.StandardScopes.Profile,
-                    IdentityServerConstants.StandardScopes.Email,
-                    "books.read",
-                    "roles"
-                },
-                        ClientId = "C95335E5814247ECAC857646BB5676D5",
-                        RequireClientSecret = false,
-                        ClientName = "API Swagger test client",
-                        RedirectUris = { "https://localhost:7141/swagger/oauth2-redirect.html" },
-                    };
-                    configurationDbContext.Clients.Add(testClient.ToEntity());
-                }
-                try
+                    Name = "inventory.update",
+                    DisplayName = "inventory.update",
+                    Description = "Grant access to updating inventory"
+                };
+                configurationDbContext.ApiScopes.Add(booksRead.ToEntity());
+            }
+            if (!await configurationDbContext.ApiScopes.AnyAsync(scope => scope.Name == "inventory.read"))
+            {
+                ApiScope booksRead = new()
                 {
-                    await configurationDbContext.Database.BeginTransactionAsync();
-                    await configurationDbContext.SaveChangesAsync();
-                    await configurationDbContext.Database.CommitTransactionAsync();
-                }
-                catch
+                    Name = "inventory.read",
+                    DisplayName = "inventory.read",
+                    Description = "Grant access to reading inventory"
+                };
+                configurationDbContext.ApiScopes.Add(booksRead.ToEntity());
+            }
+            if (!await configurationDbContext.ApiScopes.AnyAsync(scope => scope.Name == "inventory.delete"))
+            {
+                ApiScope booksRead = new()
                 {
-                    await configurationDbContext.Database.RollbackTransactionAsync();
-                }
+                    Name = "inventory.delete",
+                    DisplayName = "inventory.delete",
+                    Description = "Grant access to deleting inventory"
+                };
+                configurationDbContext.ApiScopes.Add(booksRead.ToEntity());
+            }
+            #endregion
+
+            try
+            {
+                await configurationDbContext.Database.BeginTransactionAsync();
+                await configurationDbContext.SaveChangesAsync();
+                await configurationDbContext.Database.CommitTransactionAsync();
+            }
+            catch
+            {
+                await configurationDbContext.Database.RollbackTransactionAsync();
             }
         }
     }
+}

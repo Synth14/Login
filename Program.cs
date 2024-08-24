@@ -15,6 +15,13 @@ using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationM
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Login.Helpers;
 using Duende.IdentityServer.Services;
+using System.Security.Cryptography;
+
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+using System.Security.Cryptography.X509Certificates;
+using System.Net;
 
 namespace Login
 {
@@ -82,6 +89,7 @@ namespace Login
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Login", Version = "v1" });
             });
+
             builder.Services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
@@ -94,8 +102,6 @@ namespace Login
                 .AddOperationalStore(o => o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddDeveloperSigningCredential();
-
-
 
             // Modification de la configuration Antiforgery
             builder.Services.AddAntiforgery(options =>
