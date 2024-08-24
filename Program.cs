@@ -92,6 +92,8 @@ namespace Login
 
             builder.Services.AddIdentityServer(options =>
             {
+                options.IssuerUri = "https://localhost:7031";
+
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
