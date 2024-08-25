@@ -23,7 +23,7 @@ namespace Login.Data
             await persistedGrantDbContext.Database.MigrateAsync();
 
             #region DefaultIdentityResources
-            if (!await configurationDbContext.IdentityResources.AnyAsync())
+            if (!await configurationDbContext.IdentityResources.AnyAsync(IdRessource => IdRessource.Name == "openid" || IdRessource.Name == "profile" || IdRessource.Name == "email" || IdRessource.Name == "phone" || IdRessource.Name == "address" || IdRessource.Name == "roles")  )
             {
                 IdentityResource[] identityResources = new IdentityResource[]
                 {
@@ -103,6 +103,29 @@ namespace Login.Data
             }
             #endregion
 
+            if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "C95335E5814247ECAC857646BB5676D5"))
+            {
+                Client testClient = new()
+                {
+                    AllowedCorsOrigins = { "https://localhost:7141" },
+                    AllowedGrantTypes = GrantTypes.Code,
+                    AllowedScopes = {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email,
+                    "inventory.delete",
+                    "inventory.update",
+                    "inventory.read",
+                    "inventory.create"
+
+                },
+                    ClientId = "C95335E5814247ECAC857646BB5676D5",
+                    RequireClientSecret = false,
+                    ClientName = "API Swagger test client",
+                    RedirectUris = { "https://localhost:7141/swagger/oauth2-redirect.html" },
+                };
+                configurationDbContext.Clients.Add(testClient.ToEntity());
+            }
             if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "78D9E2F100D049E8A46477CEFC811C49"))
             {
                 Client mvcWebApplication = new()
@@ -152,6 +175,16 @@ namespace Login.Data
                     Name = "inventory.delete",
                     DisplayName = "inventory.delete",
                     Description = "Grant access to deleting inventory"
+                };
+                configurationDbContext.ApiScopes.Add(booksRead.ToEntity());
+            }
+            if (!await configurationDbContext.ApiScopes.AnyAsync(scope => scope.Name == "inventory.create"))
+            {
+                ApiScope booksRead = new()
+                {
+                    Name = "inventory.create",
+                    DisplayName = "inventory.create",
+                    Description = "Grant access to creating inventory item"
                 };
                 configurationDbContext.ApiScopes.Add(booksRead.ToEntity());
             }
