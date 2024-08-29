@@ -22,6 +22,7 @@ using System.Text;
 
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
+using Microsoft.IdentityModel.Logging;
 
 namespace Login
 {
@@ -30,17 +31,16 @@ namespace Login
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDevelopmentSignKey();
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!
                 .Replace("{DbUser}", builder.Configuration["ConnectionStrings:DbUser"])
                 .Replace("{DbPassword}", builder.Configuration["ConnectionStrings:DbPassword"]);
-
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-            builder.Services.AddDevelopmentSignKey();
-
+            
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -79,10 +79,18 @@ namespace Login
             {
                 o.LogoutPath = "/account/logout";
             });
-            builder.Services.AddTransient<IEmailService, EmailService>(); 
+            builder.Services.AddTransient<IEmailService, EmailService>();
             builder.Services.AddSingleton<IEventSink, IdentityServerEventSink>();
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
             builder.Services.AddAuthentication();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -99,11 +107,12 @@ namespace Login
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
             })
-                .AddConfigurationStore(o =>
-                o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
-                .AddOperationalStore(o => o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
-                .AddAspNetIdentity<ApplicationUser>()
-                .AddDeveloperSigningCredential();
+
+            .AddConfigurationStore(o =>
+            o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+            .AddOperationalStore(o => o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddDeveloperSigningCredential();
 
             // Modification de la configuration Antiforgery
             builder.Services.AddAntiforgery(options =>
@@ -152,6 +161,9 @@ namespace Login
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.UseCors("AllowAll");
+
+
             app.Run();
         }
     }

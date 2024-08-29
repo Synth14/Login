@@ -52,6 +52,7 @@
 
   <ItemGroup>
     <Folder Include="DataProtection-Keys\" />
+    <Folder Include="keys\" />
   </ItemGroup>
 
 </Project>

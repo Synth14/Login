@@ -126,6 +126,30 @@ namespace Login.Data
                 };
                 configurationDbContext.Clients.Add(testClient.ToEntity());
             }
+            if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "A7B29F3D12E654C8F0932167D4E8A0B1"))
+            {
+                Client client = new()
+                {
+                    AllowedCorsOrigins = { "https://localhost:8433" },
+                    AllowedGrantTypes = GrantTypes.Code,
+                    AllowedScopes = {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email,
+                    "inventory.delete",
+                    "inventory.update",
+                    "inventory.read",
+                    "inventory.create"
+
+                },
+                    ClientId = "A7B29F3D12E654C8F0932167D4E8A0B1",
+                    RequireClientSecret = false,
+                    ClientName = "Front - StockTracker.Client",
+                    RedirectUris = { "https://localhost:8433/signin-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:8433/signout-callback-oidc" }
+                };
+                configurationDbContext.Clients.Add(client.ToEntity());
+            }
             if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "78D9E2F100D049E8A46477CEFC811C49"))
             {
                 Client mvcWebApplication = new()
