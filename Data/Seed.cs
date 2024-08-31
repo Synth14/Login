@@ -107,7 +107,7 @@ namespace Login.Data
             {
                 Client testClient = new()
                 {
-                    AllowedCorsOrigins = { "https://localhost:7141" },
+                    AllowedCorsOrigins = { "https://localhost:7141", "https://st-api.solidr-it.org" },
                     AllowedGrantTypes = GrantTypes.Code,
                     AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
@@ -122,7 +122,7 @@ namespace Login.Data
                     ClientId = "C95335E5814247ECAC857646BB5676D5",
                     RequireClientSecret = false,
                     ClientName = "API Swagger test client",
-                    RedirectUris = { "https://localhost:7141/swagger/oauth2-redirect.html" },
+                    RedirectUris = { "https://localhost:7141/swagger/oauth2-redirect.html", "https://st-api.solidr-it.org/swagger/oauth-redirect.html" },
                 };
                 configurationDbContext.Clients.Add(testClient.ToEntity());
             }
@@ -130,7 +130,7 @@ namespace Login.Data
             {
                 Client client = new()
                 {
-                    AllowedCorsOrigins = { "https://localhost:8433" },
+                    AllowedCorsOrigins = { "https://localhost:8433", "https://st.solidr-it.org" },
                     AllowedGrantTypes = GrantTypes.Code,
                     AllowedScopes = {
                     IdentityServerConstants.StandardScopes.OpenId,
@@ -139,38 +139,24 @@ namespace Login.Data
                     "inventory.delete",
                     "inventory.update",
                     "inventory.read",
-                    "inventory.create"
+                    "inventory.create",
+                    "offline_access"
 
                 },
                     ClientId = "A7B29F3D12E654C8F0932167D4E8A0B1",
                     RequireClientSecret = false,
                     ClientName = "Front - StockTracker.Client",
-                    RedirectUris = { "https://localhost:8433/signin-oidc" },
-                    PostLogoutRedirectUris = { "https://localhost:8433/signout-callback-oidc" }
+                    AllowOfflineAccess = true,
+                    RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                    RefreshTokenExpiration = TokenExpiration.Absolute,
+                    AbsoluteRefreshTokenLifetime = 2592000, // 30 days
+                    SlidingRefreshTokenLifetime = 1296000, // 15 days
+                    RedirectUris = { "https://localhost:8433/signin-oidc", "https://st-api.solidr-it.org/signin-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:8433/signout-callback-oidc", "https://st.solidr-it.org/signout-callback-oidc" }
                 };
                 configurationDbContext.Clients.Add(client.ToEntity());
             }
-            if (!await configurationDbContext.Clients.AnyAsync(client => client.ClientId == "78D9E2F100D049E8A46477CEFC811C49"))
-            {
-                Client mvcWebApplication = new()
-                {
-                    AllowedCorsOrigins = { "https://localhost:5001" },
-                    AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                    AllowedScopes = {
-                    IdentityServerConstants.StandardScopes.OpenId,
-                    IdentityServerConstants.StandardScopes.Profile,
-                    IdentityServerConstants.StandardScopes.Email,
-                    "read",
-                    "write"
-                },
-                    ClientId = "78D9E2F100D049E8A46477CEFC811C49",
-                    ClientName = "MVC Web Application",
-                    ClientSecrets = { new Secret("22435308B4C04FD9B4886BC4457F66B445AB50DF52E34F3C904B841F380F7225".ToSha256()) },
-                    PostLogoutRedirectUris = { "https://localhost:5001/signout-callback-oidc" },
-                    RedirectUris = { "https://localhost:5001/signin-oidc" }
-                };
-                configurationDbContext.Clients.Add(mvcWebApplication.ToEntity());
-            }
+  
             #region StocktrackerScopes
             if (!await configurationDbContext.ApiScopes.AnyAsync(scope => scope.Name == "inventory.update"))
             {
