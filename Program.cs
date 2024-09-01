@@ -31,7 +31,6 @@ namespace Login
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDevelopmentSignKey();
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!
@@ -39,8 +38,13 @@ namespace Login
                 .Replace("{DbPassword}", builder.Configuration["ConnectionStrings:DbPassword"]);
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-            
+            builder.Services.AddHttpContextAccessor();
+
+
+            if (builder.Environment.IsDevelopment()){
+                builder.Services.AddDevelopmentSignKey();
+                builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            }
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -106,6 +110,8 @@ namespace Login
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+                options.UserInteraction.LogoutUrl = "/Account/Logout";
+                options.UserInteraction.LogoutIdParameter = "logoutId";
             })
 
             .AddConfigurationStore(o =>
@@ -124,6 +130,7 @@ namespace Login
                 options.HeaderName = "X-CSRF-TOKEN";
                 options.Cookie.Path = "/";
             });
+
             var app = builder.Build();
             await app.SeedDatabase();
             string[] supportedCultures = ["en-EN", "fr-FR"];
@@ -138,6 +145,8 @@ namespace Login
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Login v1"));
             }
             else
             {
@@ -147,14 +156,7 @@ namespace Login
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Login v1"));
-            }
-
             app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -162,8 +164,6 @@ namespace Login
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.UseCors("AllowAll");
-
-
             app.Run();
         }
     }

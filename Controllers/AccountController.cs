@@ -1,12 +1,15 @@
-﻿using Login.Models;
+﻿using Duende.IdentityServer.Services;
+using Login.Models;
 using Login.Services.EmailService;
 using Login.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using System.Net;
 using System.Text;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -23,6 +26,7 @@ namespace Login.Controllers
         private readonly IStringLocalizer<AccountController> _localizer;
         private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _env;
+        private readonly IIdentityServerInteractionService _interaction;
         public List<string> Errors { get; set; } = new();
 
         public AccountController(
@@ -31,7 +35,8 @@ namespace Login.Controllers
             IOptions<IdentityOptions> identityOptions,
             IStringLocalizer<AccountController> localizer,
             IEmailService emailService,
-            IWebHostEnvironment env
+            IWebHostEnvironment env,
+            IIdentityServerInteractionService interaction
         )
         {
             _userManager = userManager;
@@ -40,6 +45,8 @@ namespace Login.Controllers
             _localizer = localizer;
             _emailService = emailService;
             _env = env;
+            _interaction = interaction;
+
 
         }
 
@@ -325,6 +332,13 @@ namespace Login.Controllers
             {
                 return RedirectToAction(nameof(Created), new { returnUrl = model.ReturnUrl });
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> Logout(string logoutId)
+        {
+            var logout = await _interaction.GetLogoutContextAsync(logoutId);
+            await HttpContext.SignOutAsync();
+            return Redirect(logout?.PostLogoutRedirectUri ?? "/");
         }
     }
 }

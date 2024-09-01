@@ -1,4 +1,80 @@
-﻿@{
-    ViewData["Title"] = "Bienvenue !";
+﻿@page
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@model IndexModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@if (!User.Identity.IsAuthenticated)
+{
+    <p>Vous n'êtes pas connecté. Veuillez vous <a href="/Account/Login">connecter</a> pour accéder à l'application.</p>
 }
-<h1>Bienvenue !</h1>
+<div id="customLoadingContainer" style="display: none;">
+    <div class="loader"></div>
+    <p>Redirection en cours...</p>
+</div>
+<style>
+    #customLoadingContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 9999;
+    }
+
+        #customLoadingContainer .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: customSpin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        #customLoadingContainer p {
+            font-size: 18px;
+            color: #333;
+        }
+
+    @@keyframes customSpin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+@section Scripts {
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var loadingContainer = document.getElementById('customLoadingContainer');
+                if (loadingContainer) {
+                    loadingContainer.style.display = 'flex';
+                }
+                    window.location.href = 'https://localhost:8433/';
+            });
+        </script>
+    }
+}
+
+@functions {
+    public class IndexModel : PageModel
+    {
+        public IActionResult OnGet()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return Redirect("https://localhost:8433/");
+            }
+            return Page();
+        }
+    }
+}
