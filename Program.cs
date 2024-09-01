@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Login.Helpers;
 using Duende.IdentityServer.Services;
 using System.Security.Cryptography;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -104,7 +104,7 @@ namespace Login
 
             builder.Services.AddIdentityServer(options =>
             {
-                options.IssuerUri = "https://localhost:7031";
+                options.IssuerUri = builder.Configuration["Login:BaseURL"];
 
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;

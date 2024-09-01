@@ -150,8 +150,12 @@ namespace Login.Controllers
         {
             if (!ModelState.IsValid)
                 return View("~/Views/Account/Register.cshtml", viewModel);
-            ApplicationUser user = new(viewModel.UserName);
-
+            ApplicationUser user = new(viewModel.UserName)
+            {
+                FirstName = viewModel.FirstName,
+                LastName = viewModel.LastName,
+                Email = viewModel.UserName 
+            };
             IdentityResult result = await _userManager.CreateAsync(user, viewModel.Password);
             if (!result.Succeeded)
             {

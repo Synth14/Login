@@ -1,7 +1,13 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.RazorPages
-@model IndexModel
+@using Microsoft.Extensions.Configuration
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IConfiguration Configuration
+
+@{
+    var blazorAppUrl = Configuration["StockTracker.Client:BaseURL"];
+}
+
 @if (!User.Identity.IsAuthenticated)
 {
     <p>Vous n'êtes pas connecté. Veuillez vous <a href="/Account/Login">connecter</a> pour accéder à l'application.</p>
@@ -59,22 +65,8 @@
                 if (loadingContainer) {
                     loadingContainer.style.display = 'flex';
                 }
-                    window.location.href = 'https://localhost:8433/';
+                window.location.href = '@blazorAppUrl';
             });
         </script>
-    }
-}
-
-@functions {
-    public class IndexModel : PageModel
-    {
-        public IActionResult OnGet()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return Redirect("https://localhost:8433/");
-            }
-            return Page();
-        }
     }
 }
