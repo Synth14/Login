@@ -54,5 +54,9 @@
     <Folder Include="DataProtection-Keys\" />
     <Folder Include="keys\" />
   </ItemGroup>
-
+	<ItemGroup>
+		<Content Include="Resources\EmailTemplates\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

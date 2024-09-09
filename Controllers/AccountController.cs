@@ -84,35 +84,6 @@ namespace Login.Controllers
                 ModelState.AddModelError(nameof(LoginViewModel.Password), _localizer["IsLockedOut", timeSpan]);
                 return View(viewModel);
             }
-            else if (result.RequiresTwoFactor)
-            {
-                throw new NotImplementedException();
-                //IList<string> providers = await _userManager.GetValidTwoFactorProvidersAsync(user);
-                //if (user.TwoFactorsAuthenticationProvider == "Email" || user.TwoFactorsAuthenticationProvider == "Phone")
-                //{
-                //    string token = await _userManager.GenerateTwoFactorTokenAsync(user, user.TwoFactorsAuthenticationProvider!);
-
-                //    IMFASender sender;
-                //    if (user.TwoFactorsAuthenticationProvider == "Email")
-                //    {
-                //        sender = _mfaSenders.First(s => s is EmailService);
-                //        await sender.SendCode(token, user.Email!);
-
-                //    }
-                //    else if (user.TwoFactorsAuthenticationProvider == "Phone")
-                //    {
-                //        sender = _mfaSenders.First(s => s is SmsService);
-                //        await sender.SendCode(token, user.PhoneNumber!);
-                //    }
-                //    else
-                //        throw new Exception("Invalid authentication provider");
-
-                //    if (_env.IsDevelopment())
-                //        return RedirectToAction(nameof(TwoFactorAuthenticationLogin), new { returnUrl, user.TwoFactorsAuthenticationProvider, token });
-
-                //}
-                //return RedirectToAction(nameof(TwoFactorAuthenticationLogin), new { returnUrl, user.TwoFactorsAuthenticationProvider });
-            }
             else if (result.Succeeded)
             {
                 if (user.LockoutEnabled)
@@ -171,7 +142,7 @@ namespace Login.Controllers
             if (_identityOptions.SignIn.RequireConfirmedAccount)
             {
                 Uri uri = await SendAccountConfirmationEmailAsync(user, returnUrl);
-                if (_env.IsDevelopment())
+                if (_env.IsStaging())
                     return RedirectToAction(nameof(Created), new { callbackUri = WebUtility.UrlEncode(uri.AbsoluteUri) });
                 else
                     return RedirectToAction(nameof(Created), new { returnUrl });
@@ -241,7 +212,7 @@ namespace Login.Controllers
 
             await _emailService.SendResetPasswordEmailAsync(viewModel.UserName, callbackUri);
 
-            if (_env.IsDevelopment())
+            if (_env.IsStaging())
                 return RedirectToAction(nameof(ForgotPasswordEmailSent), new { callbackUri });
             else
                 return RedirectToAction(nameof(ForgotPasswordEmailSent));
@@ -328,7 +299,7 @@ namespace Login.Controllers
 
             var uri = await SendAccountConfirmationEmailAsync(user, model.ReturnUrl ?? "/");
 
-            if (_env.IsDevelopment())
+            if (_env.IsStaging())
             {
                 return RedirectToAction(nameof(Created), new { callbackUri = WebUtility.UrlEncode(uri.AbsoluteUri) });
             }

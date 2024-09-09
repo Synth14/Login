@@ -1,28 +1,17 @@
+using Duende.IdentityServer.Services;
 using Login.Data;
+using Login.DevTools;
+using Login.Helpers;
 using Login.Models;
 using Login.Resources;
 using Login.Services.EmailService;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.Localization;
-using Microsoft.AspNetCore.Mvc.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-using Login.DevTools;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Login.Helpers;
-using Duende.IdentityServer.Services;
-using System.Security.Cryptography;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
-using System.Security.Cryptography.X509Certificates;
-using System.Net;
-using Microsoft.IdentityModel.Logging;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.OpenApi.Models;
 
 namespace Login
 {
@@ -41,7 +30,8 @@ namespace Login
             builder.Services.AddHttpContextAccessor();
 
 
-            if (builder.Environment.IsDevelopment()){
+            if (builder.Environment.IsDevelopment())
+            {
                 builder.Services.AddDevelopmentSignKey();
                 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             }
@@ -83,7 +73,13 @@ namespace Login
             {
                 o.LogoutPath = "/account/logout";
             });
-            builder.Services.AddTransient<IEmailService, EmailService>();
+            builder.Services.AddTransient<IEmailService, EmailService>(sp =>
+                new EmailService(
+                    sp.GetRequiredService<IConfiguration>(),
+                    sp.GetRequiredService<IWebHostEnvironment>(),
+                      sp.GetRequiredService<ILogger<EmailService>>()
+                    )
+                );
             builder.Services.AddSingleton<IEventSink, IdentityServerEventSink>();
 
             builder.Services.AddCors(options =>
