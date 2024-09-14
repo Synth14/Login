@@ -21,20 +21,25 @@ namespace Login
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Configuration setup
+            builder.Configuration
+                .SetBasePath(builder.Environment.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!
-                .Replace("{DbUser}", builder.Configuration["ConnectionStrings:DbUser"])
-                .Replace("{DbPassword}", builder.Configuration["ConnectionStrings:DbPassword"]);
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
             builder.Services.AddHttpContextAccessor();
-
 
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddDevelopmentSignKey();
                 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             }
+
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -46,7 +51,7 @@ namespace Login
              .AddEntityFrameworkStores<ApplicationDbContext>()
              .AddDefaultTokenProviders();
 
-            // Modification de la configuration de DataProtection
+            // DataProtection configuration
             builder.Services.AddDataProtection()
                   .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
                   .SetApplicationName("Login")
@@ -77,9 +82,9 @@ namespace Login
                 new EmailService(
                     sp.GetRequiredService<IConfiguration>(),
                     sp.GetRequiredService<IWebHostEnvironment>(),
-                      sp.GetRequiredService<ILogger<EmailService>>()
-                    )
-                );
+                    sp.GetRequiredService<ILogger<EmailService>>()
+                )
+            );
             builder.Services.AddSingleton<IEventSink, IdentityServerEventSink>();
 
             builder.Services.AddCors(options =>
@@ -109,26 +114,27 @@ namespace Login
                 options.UserInteraction.LogoutUrl = "/Account/Logout";
                 options.UserInteraction.LogoutIdParameter = "logoutId";
             })
-
             .AddConfigurationStore(o =>
-            o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
-            .AddOperationalStore(o => o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+                o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+            .AddOperationalStore(o =>
+                o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
             .AddAspNetIdentity<ApplicationUser>()
             .AddDeveloperSigningCredential();
 
-            // Modification de la configuration Antiforgery
+            // Antiforgery configuration
             builder.Services.AddAntiforgery(options =>
             {
                 options.Cookie.Name = ".AspNetCore.Antiforgery.NewKey";
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                options.Cookie.SameSite = SameSiteMode.Lax; // Changé à Lax pour la compatibilité
+                options.Cookie.SameSite = SameSiteMode.Lax;
                 options.HeaderName = "X-CSRF-TOKEN";
                 options.Cookie.Path = "/";
             });
 
             var app = builder.Build();
             await app.SeedDatabase();
+
             string[] supportedCultures = ["en-EN", "fr-FR"];
             RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[1])
@@ -136,6 +142,7 @@ namespace Login
                 .AddSupportedUICultures(supportedCultures);
 
             app.UseRequestLocalization(localizationOptions);
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
