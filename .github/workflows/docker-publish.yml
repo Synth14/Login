@@ -28,4 +28,4 @@ jobs:
           file: ./Login/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: synth14/Login:latest
+          tags: synth14/login:latest
