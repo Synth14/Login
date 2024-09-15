@@ -17,10 +17,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 RUN mkdir -p /app/keys && chown -R 1000:1000 /app/keys
-RUN mkdir -p /app/keys && chown -R 1000:1000 /app/temp
 
 USER 1000
 VOLUME /app/keys
-
-VOLUME /app/temp
 ENTRYPOINT ["dotnet", "Login.dll"]
