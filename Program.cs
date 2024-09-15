@@ -119,7 +119,7 @@ namespace Login
             .AddOperationalStore(o =>
                 o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
             .AddAspNetIdentity<ApplicationUser>()
-            .AddDeveloperSigningCredential();
+            .AddDeveloperSigningCredential(persistKey: true, filename: Path.Combine(Environment.GetEnvironmentVariable("TEMPKEY_DIRECTORY") ?? ".", "tempkey.jwk"));
 
             // Antiforgery configuration
             builder.Services.AddAntiforgery(options =>
