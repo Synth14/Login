@@ -20,16 +20,26 @@ namespace Login
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // Configuration setup
             builder.Configuration
                 .SetBasePath(builder.Environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-
+            var requiredEnvVars = new[] { "DB_SERVER", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD" };
+            foreach (var envVar in requiredEnvVars)
+            {
+                if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(envVar)))
+                {
+                    throw new InvalidOperationException($"Environment variable '{envVar}' is not set.");
+                }
+                if (envVar == "DB_PORT")
+                {
+                    Console.WriteLine(envVar.GetType());
+                }
+            }
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            var connectionString = builder.Configuration.GetEnhancedConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
             builder.Services.AddHttpContextAccessor();
