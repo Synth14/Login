@@ -45,23 +45,26 @@ namespace Login
             Console.WriteLine($"DB_PORT: {Environment.GetEnvironmentVariable("DB_PORT")}");
             Console.WriteLine($"DB_NAME: {Environment.GetEnvironmentVariable("DB_NAME")}");
             Console.WriteLine($"DB_USER: {Environment.GetEnvironmentVariable("DB_USER")}");
-
+            builder.WebHost.UseKestrel(options =>
+            {
+                options.ListenAnyIP(7031);
+            });
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseMySql(
-            dbSettings.ConnectionString,
-            new MySqlServerVersion(new Version(8, 0, 21)),
-            mySqlOptions =>
-            {
-                mySqlOptions.MigrationsAssembly("Login");
-                mySqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null
-                );
-            }
-        )
-    );
+                options.UseMySql(
+                    dbSettings.ConnectionString,
+                    new MySqlServerVersion(new Version(8, 0, 21)),
+                    mySqlOptions =>
+                    {
+                        mySqlOptions.MigrationsAssembly("Login");
+                        mySqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null
+                        );
+                    }
+                )
+            );
             builder.Services.AddHttpContextAccessor();
 
             if (builder.Environment.IsDevelopment())
@@ -150,7 +153,7 @@ namespace Login
                 o.ConfigureDbContext = ctx => ctx.UseMySql(dbSettings.ConnectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
             .AddAspNetIdentity<ApplicationUser>()
             .AddDeveloperSigningCredential(persistKey: true, filename: Path.Combine(Environment.GetEnvironmentVariable("TEMPKEY_DIRECTORY") ?? ".", "tempkey.jwk"));
-
+            
             // Antiforgery configuration
             builder.Services.AddAntiforgery(options =>
             {
@@ -187,7 +190,7 @@ namespace Login
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseIdentityServer();
