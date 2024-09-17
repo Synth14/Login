@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text.Json;
 
-namespace Login.DevTools
+namespace Login.Helpers
 {
     public static class DevelopmentCertificateExtension
     {
@@ -35,7 +35,7 @@ namespace Login.DevTools
 
                 File.WriteAllText(filename, JsonSerializer.Serialize(jwk));
             }
-            SigningCredentials credential = new (jwk, jwk.Alg);
+            SigningCredentials credential = new(jwk, jwk.Alg);
             return credential;
         }
     }

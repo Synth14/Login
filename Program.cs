@@ -1,8 +1,8 @@
 using Duende.IdentityServer.Services;
 using Login.Data;
-using Login.DevTools;
 using Login.Helpers;
 using Login.Models;
+using Login.Models.Settings;
 using Login.Resources;
 using Login.Services.EmailService;
 using Microsoft.AspNetCore.DataProtection;
@@ -38,10 +38,12 @@ namespace Login
                     Console.WriteLine(envVar.GetType());
                 }
             }
+            builder.Services.ConfigureAppSettings(builder.Configuration);
+            var dbSettings = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseSettings>();
+
             // Add services to the container.
-            var connectionString = builder.Configuration.GetEnhancedConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
+                options.UseMySql(dbSettings.ConnectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
             builder.Services.AddHttpContextAccessor();
 
             if (builder.Environment.IsDevelopment())
@@ -90,9 +92,9 @@ namespace Login
             });
             builder.Services.AddTransient<IEmailService, EmailService>(sp =>
                 new EmailService(
-                    sp.GetRequiredService<IConfiguration>(),
                     sp.GetRequiredService<IWebHostEnvironment>(),
-                    sp.GetRequiredService<ILogger<EmailService>>()
+                    sp.GetRequiredService<ILogger<EmailService>>(),
+                    sp.GetRequiredService<EmailSettings>()
                 )
             );
             builder.Services.AddSingleton<IEventSink, IdentityServerEventSink>();
@@ -125,9 +127,9 @@ namespace Login
                 options.UserInteraction.LogoutIdParameter = "logoutId";
             })
             .AddConfigurationStore(o =>
-                o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+                o.ConfigureDbContext = ctx => ctx.UseMySql(dbSettings.ConnectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
             .AddOperationalStore(o =>
-                o.ConfigureDbContext = ctx => ctx.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
+                o.ConfigureDbContext = ctx => ctx.UseMySql(dbSettings.ConnectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")))
             .AddAspNetIdentity<ApplicationUser>()
             .AddDeveloperSigningCredential(persistKey: true, filename: Path.Combine(Environment.GetEnvironmentVariable("TEMPKEY_DIRECTORY") ?? ".", "tempkey.jwk"));
 

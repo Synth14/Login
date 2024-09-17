@@ -1,27 +1,18 @@
-﻿using System.Net;
+﻿using Login.Models.Settings;
+using System.Net;
 using System.Net.Mail;
 
 namespace Login.Services.EmailService
 {
     public class EmailService : IEmailService
     {
-        private readonly string _smtpServer;
-        private readonly int _smtpPort;
-        private readonly string _smtpUsername;
-        private readonly string _smtpPassword;
-        private readonly string _senderEmail;
-        private readonly string _templatePath;
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<EmailService> _logger;
+        private readonly EmailSettings _emailSettings;
 
-        public EmailService(IConfiguration configuration, IWebHostEnvironment environment, ILogger<EmailService> logger)
+        public EmailService(IWebHostEnvironment environment, ILogger<EmailService> logger, EmailSettings emailSettings)
         {
-            _smtpServer = configuration["Email:SmtpServer"];
-            _smtpPort = int.Parse(configuration["Email:SmtpPort"]);
-            _smtpUsername = configuration["Email:SmtpUsername"];
-            _smtpPassword = configuration["Email:SmtpPassword"];
-            _senderEmail = configuration["Email:SenderEmail"];
-            _templatePath = configuration["Email:TemplatePath"];
+            _emailSettings = emailSettings;
             _environment = environment;
             _logger = logger;
         }
@@ -29,7 +20,7 @@ namespace Login.Services.EmailService
         public async Task SendAccountConfirmationEmailAsync(string username, Uri callbackUri)
         {
             string subject = "Validation de votre compte";
-            string templatePath = Path.Combine(_environment.ContentRootPath, _templatePath.TrimStart('/'), "AccountConfirmation.html");
+            string templatePath = Path.Combine(_environment.ContentRootPath, _emailSettings.TemplatePath.TrimStart('/'), "AccountConfirmation.html");
 
             _logger.LogInformation($"Attempting to read template from: {templatePath}");
 
@@ -49,7 +40,7 @@ namespace Login.Services.EmailService
         public async Task SendResetPasswordEmailAsync(string username, Uri callbackUri)
         {
             string subject = "Réinitialisation de mot de passe";
-            string templatePath = Path.Combine(_environment.ContentRootPath, _templatePath.TrimStart('/'), "ResetPassword.html");
+            string templatePath = Path.Combine(_environment.ContentRootPath, _emailSettings.TemplatePath.TrimStart('/'), "ResetPassword.html");
 
             _logger.LogInformation($"Attempting to read template from: {templatePath}");
 
@@ -68,15 +59,15 @@ namespace Login.Services.EmailService
 
         private async Task SendEmailAsync(string toEmail, string subject, string htmlBody, string senderDisplayName)
         {
-            using (var client = new SmtpClient(_smtpServer, _smtpPort))
+            using (var client = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort))
             {
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(_smtpUsername, _smtpPassword);
+                client.Credentials = new NetworkCredential(_emailSettings.SmtpUsername, _emailSettings.SmtpPassword);
                 client.EnableSsl = true;
 
                 var message = new MailMessage
                 {
-                    From = new MailAddress(_senderEmail, senderDisplayName),
+                    From = new MailAddress(_emailSettings.SenderEmail, senderDisplayName),
                     Subject = subject,
                     Body = htmlBody,
                     IsBodyHtml = true,
