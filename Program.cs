@@ -40,10 +40,28 @@ namespace Login
             }
             builder.Services.ConfigureAppSettings(builder.Configuration);
             var dbSettings = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseSettings>();
+            Console.WriteLine($"Connection string: {dbSettings.ConnectionString}");
+            Console.WriteLine($"DB_SERVER: {Environment.GetEnvironmentVariable("DB_SERVER")}");
+            Console.WriteLine($"DB_PORT: {Environment.GetEnvironmentVariable("DB_PORT")}");
+            Console.WriteLine($"DB_NAME: {Environment.GetEnvironmentVariable("DB_NAME")}");
+            Console.WriteLine($"DB_USER: {Environment.GetEnvironmentVariable("DB_USER")}");
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(dbSettings.ConnectionString, new MySqlServerVersion(new Version(8, 0, 21)), b => b.MigrationsAssembly("Login")));
+        options.UseMySql(
+            dbSettings.ConnectionString,
+            new MySqlServerVersion(new Version(8, 0, 21)),
+            mySqlOptions =>
+            {
+                mySqlOptions.MigrationsAssembly("Login");
+                mySqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null
+                );
+            }
+        )
+    );
             builder.Services.AddHttpContextAccessor();
 
             if (builder.Environment.IsDevelopment())
