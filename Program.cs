@@ -8,6 +8,7 @@ using Login.Services.EmailService;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -66,13 +67,22 @@ namespace Login
                 )
             );
             builder.Services.AddHttpContextAccessor();
-
+            //pour le reverseproxy
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddDevelopmentSignKey();
                 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             }
-
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.None;
+            });
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -167,7 +177,7 @@ namespace Login
 
             var app = builder.Build();
             await app.SeedDatabase();
-
+            app.UseForwardedHeaders();
             string[] supportedCultures = ["en-EN", "fr-FR"];
             RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[1])
