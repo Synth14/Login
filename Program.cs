@@ -193,10 +193,14 @@ namespace Login
                 app.UseMigrationsEndPoint();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Login v1"));
+                app.UseForwardedHeaders();
+
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseForwardedHeaders();
+
             }
 
             app.UseHttpsRedirection();
