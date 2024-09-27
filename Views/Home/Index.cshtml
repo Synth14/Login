@@ -3,9 +3,10 @@
 @using Microsoft.Extensions.Configuration
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @inject IConfiguration Configuration
+@inject Login.Models.Settings.AppSettings appsettings
 
 @{
-    var blazorAppUrl = Configuration["StockTracker.Client:BaseURL"];
+    var blazorAppUrl = appsettings.StockTrackerClient.BaseURL;
 }
 
 @if (!User.Identity.IsAuthenticated)
