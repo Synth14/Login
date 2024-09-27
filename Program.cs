@@ -41,6 +41,7 @@ namespace Login
             }
             builder.Services.ConfigureAppSettings(builder.Configuration);
             var dbSettings = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseSettings>();
+            var appSettings = builder.Services.BuildServiceProvider().GetRequiredService<AppSettings>();
             Console.WriteLine($"Connection string: {dbSettings.ConnectionString}");
             Console.WriteLine($"DB_SERVER: {Environment.GetEnvironmentVariable("DB_SERVER")}");
             Console.WriteLine($"DB_PORT: {Environment.GetEnvironmentVariable("DB_PORT")}");
@@ -148,8 +149,7 @@ namespace Login
 
             builder.Services.AddIdentityServer(options =>
             {
-                options.IssuerUri = builder.Configuration["Login:BaseURL"];
-
+                options.IssuerUri = appSettings.Login.BaseURL;
                 options.Events.RaiseErrorEvents = true;
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
