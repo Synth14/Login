@@ -48,8 +48,7 @@ namespace Login
             Console.WriteLine($"DB_USER: {Environment.GetEnvironmentVariable("DB_USER")}");
             builder.WebHost.UseKestrel(options =>
             {
-                options.ListenAnyIP(7032);
-                options.ListenAnyIP(7031, listenOptions => listenOptions.UseHttps());
+                options.ListenAnyIP(7031);
             });
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -198,7 +197,6 @@ namespace Login
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
